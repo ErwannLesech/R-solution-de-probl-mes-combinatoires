@@ -1,91 +1,84 @@
-# Générateur et Solveur de Sudoku
+# Résolution de Problèmes Combinatoires - Sudoku
 
-Ce projet permet de générer et résoudre des grilles de Sudoku de différentes tailles.
+## 🎯 Le Projet
 
-## Fonctionnalités
+Ce projet explore différentes approches algorithmiques pour résoudre des problèmes combinatoires, en utilisant le Sudoku comme cas d'application. L'objectif principal est de **comprendre et comparer** comment différentes stratégies influencent les performances de résolution.
 
-1. **Génération de grilles** : Création de grilles Sudoku solvables de différentes tailles (4x4, 9x9, 16x16, etc.)
-2. **Résolution par force brute** : Algorithme de backtracking pour résoudre les grilles
-3. **Import/Export de fichiers** : Lecture et écriture de grilles au format texte
+Nous implémentons plusieurs versions d'algorithmes, de la plus simple (backtracking naïf) à des approches plus sophistiquées, afin d'observer concrètement l'impact des optimisations sur les temps de calcul et la capacité à traiter des problèmes de grande taille.
 
-## Format des fichiers
+## 📁 Architecture du Projet
 
-Les grilles sont stockées dans des fichiers texte avec le format suivant :
-- Un point (`.`) représente une case vide
-- Les chiffres représentent les valeurs remplies
-- Chaque ligne du fichier représente une ligne de la grille
+Le code est organisé de manière modulaire pour faciliter la compréhension et l'évolution :
 
-Exemple pour une grille 4x4 :
+```
+├── sudoku_solver_v1.py        # Algorithme de résolution V1 (backtracking simple)
+├── main.py                    # Interface d'utilisation (CLI)
+├── utils.py                   # Utilitaires (chargement, sauvegarde, affichage)
+├── sudoku_generator.py        # Générateur de grilles de test
+├── data/
+│   ├── raw/                  # Grilles à résoudre
+│   └── resolved/             # Solutions générées
+└── README.md
+```
+
+### Séparation des responsabilités
+
+- **`sudoku_solver_v1.py`** : Contient **uniquement** l'algorithme de backtracking (~100 lignes). Code volontairement simple et commenté pour une compréhension immédiate de la logique de résolution.
+
+- **`utils.py`** : Fonctions utilitaires réutilisables (chargement/sauvegarde de fichiers, représentation de la grille, affichage).
+
+- **`main.py`** : Point d'entrée du programme, orchestre les modules et gère l'interaction utilisateur.
+
+Cette architecture permet d'ajouter facilement de nouvelles versions d'algorithmes (v2, v3...) sans modifier le reste du code.
+
+## 📊 Version 1 : Backtracking Simple
+
+### Algorithme utilisé
+
+La V1 implémente un **backtracking pur** sans aucune optimisation. C'est l'approche la plus intuitive pour résoudre un Sudoku :
+
+```
+1. Trouver la première cellule vide
+2. Essayer tous les nombres de 1 à N
+3. Pour chaque nombre :
+   - Vérifier s'il respecte les contraintes (ligne, colonne, bloc)
+   - Si oui : placer le nombre et continuer récursivement
+   - Si la récursion réussit : problème résolu
+   - Sinon : retirer le nombre (backtrack) et essayer le suivant
+4. Si aucun nombre ne fonctionne : retour arrière
+```
+
+### Performances observées
+
+| Taille de grille | Temps de résolution | Statut |
+|------------------|---------------------|---------|
+| **4×4**          | < 1 seconde        | ✅ Excellent |
+| **9×9**          | < 5 secondes       | ✅ Acceptable |
+| **16×16**        | > 1 minute         | ⚠️ Lent |
+| **25×25**        | Plusieurs heures   | ❌ Impraticable |
+
+### Limitations
+
+Le backtracking simple explore **toutes les possibilités** de manière aveugle, ce qui génère un arbre de recherche exponentiel. Sans heuristiques ni propagation de contraintes, l'algorithme teste énormément de combinaisons invalides avant de trouver la solution.
+
+Ces limitations sont **volontaires** : elles démontrent la nécessité d'approches plus intelligentes pour traiter des problèmes de grande taille. Les versions futures introduiront des optimisations progressives.
+
+## � Utilisation
+
+```bash
+# Mode interactif
+python3 main.py
+
+# Résoudre une grille directement
+python3 main.py data/raw/exemple_9x9.txt
+```
+
+**Format des fichiers** : un point `.` pour les cases vides, les chiffres pour les valeurs.
+
+Exemple 4×4 :
 ```
 1...
 .3.2
 2...
 ...4
 ```
-
-Exemple pour une grille 9x9 :
-```
-53..7....
-6..195...
-.98....6.
-8...6...3
-4..8.3..1
-7...2...6
-.6....28.
-...419..5
-....8..79
-```
-
-## Utilisation
-
-### Script principal
-```bash
-python3 sudoku_solver_v1.py
-```
-
-Le script propose un menu interactif avec les options suivantes :
-1. Générer une nouvelle grille de Sudoku
-2. Résoudre une grille depuis un fichier
-3. Quitter
-
-### Génération de grilles de test
-```bash
-python3 generate_test_grids.py
-```
-
-Ce script génère automatiquement des grilles de test de différentes tailles et difficultés.
-
-## Limitations
-
-⚠️ **Attention** : L'algorithme de force brute devient très lent pour les grandes grilles (16x16 et plus). Il est conçu pour être basique et sera impraticable pour les grosses dimensions, comme demandé.
-
-## Structure du projet
-
-```
-├── sudoku_solver_v1.py        # Script principal
-├── generate_test_grids.py     # Générateur de grilles de test
-├── data/                      # Dossier contenant les grilles
-│   ├── exemple_4x4.txt       # Exemple de grille 4x4
-│   ├── exemple_9x9.txt       # Exemple de grille 9x9
-│   └── (grilles générées)
-└── README.md                  # Ce fichier
-```
-
-## Exemples d'utilisation
-
-1. **Générer une grille 9x9 de difficulté moyenne** :
-   - Lancer le script principal
-   - Choisir option 1
-   - Entrer 9 comme dimension
-   - Choisir "medium" comme difficulté
-
-2. **Résoudre la grille d'exemple** :
-   - Lancer le script principal
-   - Choisir option 2
-   - Entrer "data/exemple_9x9.txt" comme fichier
-
-## Classes principales
-
-- `SudokuGrid` : Représente une grille de Sudoku avec méthodes de validation et résolution
-- `SudokuGenerator` : Génère des grilles complètes et crée des puzzles
-- Fonctions utilitaires pour charger/sauvegarder les fichiers
