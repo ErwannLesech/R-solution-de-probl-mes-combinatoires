@@ -5,9 +5,11 @@ Permet de charger et résoudre des grilles de Sudoku avec différents algorithme
 """
 
 import sys
+import time
 from utils import SudokuGrid, load_grid_from_file, save_grid_to_file, get_solution_filename, find_file_in_raw
 from solvers.sudoku_solver_backtracking import SudokuSolver as BacktrackingSolver
 from solvers.sudoku_solver_bruteforce import SudokuSolver as BruteforceSolver
+from solvers.sudoku_solver_backtracking_human_reflexion import SudokuSolver as HumanReflexionSolver
 
 
 def get_solver_choice():
@@ -15,6 +17,7 @@ def get_solver_choice():
     print("\nChoisissez un algorithme de résolution:")
     print("1. Backtracking (recommandé)")
     print("2. Brute Force")
+    print("3. Human Reflexion Backtracking")
     
     while True:
         choice = input("\nVotre choix (1-2): ").strip()
@@ -22,8 +25,10 @@ def get_solver_choice():
             return BacktrackingSolver, "backtracking"
         elif choice == "2":
             return BruteforceSolver, "brute force"
+        elif choice == "3":
+            return HumanReflexionSolver, "human reflexion backtracking"
         else:
-            print("Choix invalide. Veuillez choisir 1 ou 2.")
+            print("Choix invalide. Veuillez choisir 1, 2 ou 3.")
 
 
 def solve_grid(grid, solver_class, algorithm_name):
@@ -116,9 +121,15 @@ if __name__ == "__main__":
         algorithm_name = "backtracking"
         
         if len(sys.argv) > 2:
-            if sys.argv[2] == "2":
+            if sys.argv[2] == "1":
                 solver_class = BruteforceSolver
                 algorithm_name = "brute force"
+            elif sys.argv[2] == "2":
+                solver_class = BacktrackingSolver
+                algorithm_name = "backtracking"
+            elif sys.argv[2] == "3":
+                solver_class = HumanReflexionSolver
+                algorithm_name = "human reflexion backtracking"
         
         # Chercher le fichier dans data/raw/ si nécessaire
         filename = find_file_in_raw(filename)
@@ -132,8 +143,14 @@ if __name__ == "__main__":
             print("Grille originale:")
             grid.display()
             
+            begin_time = time.time()
+            
             # Résoudre la grille
             solved_grid = solve_grid(grid, solver_class, algorithm_name)
+            
+            end_time = time.time()
+            elapsed_time = end_time - begin_time
+            print(f"Temps de résolution : {elapsed_time:.2f} secondes")
             
             if solved_grid:
                 # Sauvegarde automatique en mode ligne de commande
